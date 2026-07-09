@@ -233,20 +233,28 @@ const AutoDashboard = () => {
 
   const keys = Object.keys(data[0]);
 
-  const labelKey = keys[0];
+  const chartColumn =
+    keys.find(
+      (k) =>
+        k.toLowerCase().includes("department") ||
+        k.toLowerCase().includes("designation") ||
+        k.toLowerCase().includes("city"),
+    ) || keys[1];
 
   const groupedData = {};
 
   data.forEach((row) => {
-    const key = String(row[labelKey] || "Unknown");
+    const key = row[chartColumn] || "Unknown";
 
     groupedData[key] = (groupedData[key] || 0) + 1;
   });
 
-  const chartData = Object.keys(groupedData).map((key) => ({
-    name: key,
-    value: groupedData[key],
+  const chartData = Object.entries(groupedData).map(([name, value]) => ({
+    name,
+    value,
   }));
+
+  const chartDataLimited = chartData.slice(0, 15);
   return (
     <div className="min-h-screen bg-[#050816] text-white p-8">
       {/* HEADER */}
@@ -380,7 +388,7 @@ const AutoDashboard = () => {
             <h2>Bar Chart</h2>
 
             <ResponsiveContainer width="90%" height={200}>
-              <BarChart data={chartData}>
+              <BarChart data={chartDataLimited}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -401,7 +409,7 @@ const AutoDashboard = () => {
             <h2>Line Chart</h2>
 
             <ResponsiveContainer width="90%" height={200}>
-              <LineChart data={chartData}>
+              <LineChart data={chartDataLimited}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -425,7 +433,7 @@ const AutoDashboard = () => {
             <ResponsiveContainer width="90%" height={250}>
               <PieChart>
                 <Pie
-                  data={chartData}
+                  data={chartDataLimited}
                   dataKey="value"
                   nameKey="name"
                   innerRadius={60}
@@ -441,15 +449,15 @@ const AutoDashboard = () => {
                 </Pie>
 
                 <Tooltip />
-
-                <Legend
+                {chartDataLimited.length <= 10 && <Legend />}
+                {/* <Legend
                   layout="horizontal"
                   verticalAlign="bottom"
                   align="center"
                   formatter={(value, entry, index) =>
                     `${chartData[index]?.name} (${chartData[index]?.value})`
                   }
-                />
+                /> */}
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -465,7 +473,7 @@ const AutoDashboard = () => {
             <h2>Area Chart</h2>
 
             <ResponsiveContainer width="90%" height={200}>
-              <AreaChart data={chartData}>
+              <AreaChart data={chartDataLimited}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
                 <YAxis />
@@ -484,7 +492,17 @@ const AutoDashboard = () => {
 
         {/* TABLE */}
         {/* TABLE */}
-        <div id="pdf-table" style={{ marginTop: "30px", color: "#ffffff" }}>
+        <div
+          id="pdf-table"
+          style={{
+            marginTop: "30px",
+            color: "#ffffff",
+            maxHeight: "600px",
+            overflowY: "auto",
+            border: "1px solid #374151",
+            borderRadius: "10px",
+          }}
+        >
           <h2 style={{ color: "#ffffff" }}>Dataset Preview</h2>
 
           <table
@@ -515,7 +533,7 @@ const AutoDashboard = () => {
             </thead>
 
             <tbody>
-              {data.slice(0, 20).map((row, i) => (
+              {data.slice().map((row, i) => (
                 <tr key={i}>
                   {keys.map((k) => (
                     <td

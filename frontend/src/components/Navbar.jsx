@@ -41,14 +41,6 @@ export default function Navbar() {
         {/* Desktop Navigation */}
         <div className="hidden lg:flex items-center gap-10">
           <button
-            className="group relative text-slate-300 hover:text-white transition"
-            onClick={() => navigate("/Dashboard")}
-          >
-            Dashboard
-            <span className="absolute left-0 -bottom-2 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
-          </button>
-
-          <button
             className="group relative text-slate-300 hover:text-white transition "
             onClick={() => navigate("/SupportPage")}
           >
@@ -60,13 +52,6 @@ export default function Navbar() {
             onClick={() => navigate("/auto-dashboard")}
           >
             Auto Dashboard
-            <span className="absolute left-0 -bottom-2 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
-          </button>
-          <button
-            className="group relative text-slate-300 hover:text-white transition "
-            onClick={() => navigate("/Templates")}
-          >
-            Templates
             <span className="absolute left-0 -bottom-2 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
           </button>
 
@@ -186,7 +171,32 @@ export default function Navbar() {
               </div>
             </div>
           </div>
+          {/* -----Excel Button */}
+          {/* -----Excel Button */}
+          <button
+            onClick={() => navigate("/excel-data-manager")}
+            className="
+bg-gradient-to-r
+from-cyan-500
+to-blue-600
+text-white
+font-semibold
+px-5
+py-3
+rounded-xl
+hover:scale-105
+transition-all
+duration-300
+shadow-lg
+flex
+items-center
+gap-2
+```
 
+"
+          >
+            DataVault Pro
+          </button>
           {/* Mobile Menu Button */}
           <button
             onClick={() => setOpen(!open)}

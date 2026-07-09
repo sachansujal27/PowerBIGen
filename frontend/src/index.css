@@ -1,1 +1,381 @@
 @import "tailwindcss";
+
+/* ================= ROOT ================= */
+
+:root {
+  --ink: #1f2937;
+  --paper: #f3f4f6;
+  --card: #ffffff;
+  --line: #d1d5db;
+
+  --green-100: #dcfce7;
+  --green-600: #16a34a;
+  --green-700: #15803d;
+  --green-900: #14532d;
+
+  --danger: #dc2626;
+
+  font-family: "Inter", "Segoe UI", sans-serif;
+}
+
+/* ================= PANELS ================= */
+
+.panel {
+  background: white;
+  border-radius: 10px;
+  padding: 25px;
+  margin-bottom: 30px;
+  border: 1px solid var(--line);
+}
+
+.panel h2 {
+  color: var(--green-900);
+  margin-bottom: 20px;
+}
+
+/* ================= GRID ================= */
+
+.grid-2col {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 900px) {
+  .grid-2col {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ================= CARD ================= */
+
+.card {
+  background: #fafafa;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 18px;
+}
+
+.card h3 {
+  margin-bottom: 15px;
+}
+
+/* ================= INPUT ================= */
+
+input:not([type="checkbox"]):not([type="radio"]),
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 12px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  font-size: 14px;
+}
+
+textarea {
+  resize: vertical;
+  font-family: monospace;
+}
+
+/* ================= BUTTON ================= */
+
+button {
+  cursor: pointer;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+
+  transition: 0.2s;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+.primary {
+  background: var(--green-700);
+  color: white;
+}
+
+.secondary {
+  background: white;
+  color: var(--green-700);
+
+  border: 1px solid var(--green-700);
+}
+
+.full-width-btn {
+  width: 100%;
+  margin-top: 10px;
+}
+
+button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ================= TOOLBAR ================= */
+
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  flex-wrap: wrap;
+
+  gap: 15px;
+
+  margin-bottom: 20px;
+}
+
+.search-box {
+  width: 250px;
+}
+
+.count-pill {
+  padding: 8px 18px;
+
+  background: var(--green-100);
+
+  border-radius: 999px;
+
+  font-weight: bold;
+
+  color: var(--green-900);
+}
+
+.download-btn {
+  background: var(--green-700);
+
+  color: white;
+}
+
+.save-indicator {
+  font-size: 13px;
+
+  color: green;
+}
+
+/* ================= ALERT ================= */
+
+.alert {
+  padding: 12px;
+  border-radius: 6px;
+  margin-top: 10px;
+}
+
+.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.success {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.info {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+/* ================= PENDING ================= */
+
+.pending-preview {
+  margin-top: 15px;
+
+  max-height: 250px;
+
+  overflow-y: auto;
+
+  border: 1px solid #ddd;
+
+  border-radius: 6px;
+}
+
+.pending-row {
+  display: grid;
+
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)) auto;
+
+  gap: 10px;
+
+  padding: 10px;
+
+  border-bottom: 1px solid #eee;
+
+  align-items: center;
+}
+
+.pending-row button {
+  background: none;
+
+  color: red;
+
+  padding: 0;
+}
+
+.muted {
+  color: gray;
+}
+
+/* ================= DATAGRID ================= */
+
+.grid-container {
+  width: 100%;
+
+  height: 600px;
+
+  overflow: auto;
+
+  border-radius: 8px;
+
+  border: 1px solid var(--line);
+
+  background: white;
+}
+
+/* Main grid */
+.rdg {
+  width: max-content;
+  min-width: 100%;
+  background: #fff !important;
+}
+.rdg-cell {
+  white-space: nowrap;
+}
+
+.rdg-header-row {
+  font-weight: bold;
+}
+
+.rdg-viewport {
+  overflow: auto !important;
+}
+.grid-container {
+  width: 100%;
+  height: 600px;
+  overflow: auto;
+}
+/* Header */
+
+.rdg-header-row {
+  background: #15803d !important;
+
+  color: white !important;
+
+  font-weight: bold;
+}
+
+/* Header cells */
+
+.rdg-header-cell {
+  background: #15803d !important;
+
+  color: white !important;
+}
+
+/* Rows */
+
+.rdg-row {
+  background: white !important;
+
+  color: #111827 !important;
+}
+
+/* Cells */
+
+.rdg-cell {
+  background: white !important;
+
+  color: #111827 !important;
+
+  border-right: 1px solid #eee;
+
+  border-bottom: 1px solid #eee;
+
+  padding: 8px;
+}
+
+/* Selected cell */
+
+.rdg-cell[aria-selected="true"] {
+  outline: 2px solid #16a34a;
+}
+
+/* Delete button */
+
+.grid-delete-btn {
+  background: none;
+
+  border: none;
+
+  color: red;
+
+  font-weight: bold;
+
+  cursor: pointer;
+}
+
+.grid-delete-btn:hover {
+  color: darkred;
+}
+
+/* ================= PAGINATION ================= */
+
+.pagination {
+  margin-top: 20px;
+
+  display: flex;
+
+  justify-content: center;
+
+  align-items: center;
+
+  gap: 20px;
+}
+
+/* ================= UTILITIES ================= */
+
+.row-between {
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: center;
+}
+
+.hint {
+  margin-bottom: 15px;
+
+  font-size: 13px;
+
+  color: gray;
+}
+
+/* Scrollbars */
+
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #bbb;
+
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #eee;
+}
+.grid-container {
+  width: 100%;
+  height: 420px;
+  overflow: auto;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: #fff;
+}

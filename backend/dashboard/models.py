@@ -1,6 +1,7 @@
 from django.db import models
 import json
 
+from django.core.validators import RegexValidator
 class UploadedFile(models.Model):
     """Stores metadata about each uploaded file"""
     FILE_TYPES = [
@@ -72,8 +73,8 @@ class GeneratedChart(models.Model):
 
 
 class User(models.Model):
-
     username = models.CharField(max_length=100, unique=True)
+    email = models.EmailField(unique=True)
     password = models.CharField(max_length=255)
 
     def __str__(self):
@@ -94,8 +95,40 @@ class BusinessData(models.Model):
        return str(self.id)
     
 
-
-
+# ------------------------------------------------------------------------------
+# Excel project
+# ------------------------------------------------------------
+ 
+# A "proper name" = letters, spaces, hyphens and apostrophes only.
+# Blocks things like "asdf123" or "N/A" from being saved as a name.
+proper_name_validator = RegexValidator(
+    regex=r"^[A-Za-z][A-Za-z '\-]{1,99}$",
+    message="Enter a proper name (letters, spaces, hyphens and apostrophes only, min 2 characters).",
+)
+ 
+ 
+class Record(models.Model):
+    name = models.CharField(max_length=100, validators=[proper_name_validator])
+    email = models.EmailField(blank=True, null=True)
+    phone = models.CharField(max_length=20, blank=True, null=True)
+    age = models.PositiveSmallIntegerField(blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+ 
+    class Meta:
+        ordering = ["id"]
+ 
+    def __str__(self):
+        return f"{self.id} - {self.name}"
+ 
+    def save(self, *args, **kwargs):
+        # Normalize to Title Case so "john  smith" -> "John  Smith"
+        if self.name:
+            self.name = " ".join(part.capitalize() for part in self.name.strip().split(" "))
+        super().save(*args, **kwargs)
+ 
 
 
 #
@@ -109,3 +142,4 @@ class BusinessData(models.Model):
 #     def __str__(self):
 #         return self.file.name
     
+

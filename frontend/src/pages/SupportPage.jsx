@@ -16,10 +16,10 @@ const SupportPage = () => {
   const [message, setMessage] = useState("");
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -45,7 +45,8 @@ const SupportPage = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage("Support request submitted successfully.");
+        setMessage(" Support request submitted successfully.");
+
         setFormData({
           name: "",
           email: "",
@@ -57,34 +58,39 @@ const SupportPage = () => {
         setMessage(data.error || "Failed to send request.");
       }
     } catch (err) {
-      setMessage("Server connection failed.");
+      setMessage("❌ Server connection failed.");
     }
 
     setLoading(false);
   };
 
   return (
-    <div className="min-h-screen bg-[#050B18] text-white flex items-center justify-center px-4">
-      <div className="w-full max-w-3xl bg-slate-900/80 border border-slate-800 rounded-3xl p-8">
-        <div className="flex items-center gap-3 mb-8">
-          <LifeBuoy className="text-yellow-400" size={34} />
+    <div className="min-h-screen bg-[#050B18] flex justify-center items-center px-4 py-10">
+      <div className="w-full max-w-4xl rounded-3xl border border-slate-800 bg-slate-900/90 shadow-2xl p-8 md:p-10 text-white">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-10">
+          <div className="bg-yellow-400/10 p-3 rounded-full">
+            <LifeBuoy size={34} className="text-yellow-400" />
+          </div>
+
           <div>
-            <h1 className="text-3xl font-bold">Aurex BI Support Center</h1>
-            <p className="text-slate-400">
+            <h1 className="text-4xl font-bold"> POWERBIGEN Support Center</h1>
+
+            <p className="text-slate-400 text-lg mt-1">
               Submit your issue directly to our support team
             </p>
           </div>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Name */}
           <div>
-            <label className="block mb-2 text-slate-300">User Name</label>
+            <label className="block text-lg mb-2 text-slate-300">
+              User Name
+            </label>
 
-            <div className="relative">
-              <User
-                size={18}
-                className="absolute left-3 top-4 text-slate-400"
-              />
+            <div className="flex items-center h-14 bg-slate-800 border border-slate-700 rounded-xl px-4 focus-within:ring-2 focus-within:ring-yellow-400">
+              <User size={20} className="text-slate-400 mr-3 flex-shrink-0" />
 
               <input
                 type="text"
@@ -93,19 +99,19 @@ const SupportPage = () => {
                 onChange={handleChange}
                 required
                 placeholder="Enter your name"
-                className="w-full pl-10 p-3 bg-slate-800 border border-slate-700 rounded-xl"
+                className="flex-1 bg-transparent outline-none text-white placeholder:text-slate-400 mt-3"
               />
             </div>
           </div>
 
+          {/* Email */}
           <div>
-            <label className="block mb-2 text-slate-300">User Email</label>
+            <label className="block text-lg mb-2 text-slate-300">
+              User Email
+            </label>
 
-            <div className="relative">
-              <Mail
-                size={18}
-                className="absolute left-3 top-4 text-slate-400"
-              />
+            <div className="flex items-center h-14 bg-slate-800 border border-slate-700 rounded-xl px-4 focus-within:ring-2 focus-within:ring-yellow-400">
+              <Mail size={20} className="text-slate-400 mr-3 flex-shrink-0" />
 
               <input
                 type="email"
@@ -114,13 +120,14 @@ const SupportPage = () => {
                 onChange={handleChange}
                 required
                 placeholder="Enter your email"
-                className="w-full pl-10 p-3 bg-slate-800 border border-slate-700 rounded-xl"
+                className="flex-1 bg-transparent outline-none text-white placeholder:text-slate-400 mt-3"
               />
             </div>
           </div>
 
+          {/* Company Email */}
           <div>
-            <label className="block mb-2 text-slate-300">
+            <label className="block text-lg mb-2 text-slate-300">
               Company Support Email
             </label>
 
@@ -128,19 +135,22 @@ const SupportPage = () => {
               type="email"
               value={companyEmail}
               readOnly
-              className="w-full p-3 bg-slate-700 text-yellow-400 border border-slate-600 rounded-xl cursor-not-allowed"
+              className="w-full h-14 px-4 rounded-xl bg-slate-700 border border-slate-600 text-yellow-400 cursor-not-allowed outline-none mt-3"
             />
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          {/* Category + Priority */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div>
-              <label className="block mb-2">Issue Category</label>
+              <label className="block text-lg mb-2 text-slate-300">
+                Issue Category
+              </label>
 
               <select
                 name="category"
                 value={formData.category}
                 onChange={handleChange}
-                className="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl"
+                className="w-full h-14 px-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:ring-2 focus:ring-yellow-400"
               >
                 <option>Dashboard Issue</option>
                 <option>Data Upload Error</option>
@@ -152,13 +162,15 @@ const SupportPage = () => {
             </div>
 
             <div>
-              <label className="block mb-2">Priority</label>
+              <label className="block text-lg mb-2 text-slate-300">
+                Priority
+              </label>
 
               <select
                 name="priority"
                 value={formData.priority}
                 onChange={handleChange}
-                className="w-full p-3 bg-slate-800 border border-slate-700 rounded-xl"
+                className="w-full h-14 px-4 rounded-xl bg-slate-800 border border-slate-700 outline-none focus:ring-2 focus:ring-yellow-400"
               >
                 <option>Low</option>
                 <option>Medium</option>
@@ -168,33 +180,39 @@ const SupportPage = () => {
             </div>
           </div>
 
+          {/* Issue */}
           <div>
-            <label className="block mb-2">Describe Your Issue</label>
+            <label className="block text-lg mb-2 text-slate-300">
+              Describe Your Issue
+            </label>
 
             <textarea
-              rows="6"
+              rows={6}
               name="issue"
               value={formData.issue}
               onChange={handleChange}
               required
               placeholder="Explain your problem in detail..."
-              className="w-full p-4 bg-slate-800 border border-slate-700 rounded-xl"
+              className="w-full rounded-xl bg-slate-800 border border-slate-700 p-4 outline-none resize-none focus:ring-2 focus:ring-yellow-400 placeholder:text-slate-400"
             />
           </div>
 
+          {/* Button */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-yellow-400 text-black font-bold py-3 rounded-xl flex items-center justify-center gap-2 hover:scale-[1.01] transition"
+            className="w-full h-14 rounded-xl bg-yellow-400 hover:bg-yellow-300 transition-all duration-300 text-black font-bold flex justify-center items-center gap-3 disabled:opacity-70"
           >
-            <Send size={18} />
+            <Send size={20} />
+
             {loading ? "Sending..." : "Submit Support Ticket"}
           </button>
 
+          {/* Message */}
           {message && (
-            <div className="mt-4 bg-slate-800 p-4 rounded-xl flex items-center gap-2">
-              <AlertCircle size={18} />
-              {message}
+            <div className="flex items-center gap-3 rounded-xl bg-slate-800 border border-slate-700 p-4">
+              <AlertCircle className="text-yellow-400" size={20} />
+              <span>{message}</span>
             </div>
           )}
         </form>

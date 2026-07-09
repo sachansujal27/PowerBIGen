@@ -27,9 +27,9 @@ import { Routes, Route } from "react-router-dom";
 
 import { Toaster } from "react-hot-toast";
 
-import Dashboard from "./pages/Dashboard";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+
 import Templates from "./pages/Templates";
 
 import BusinessMain from "./pages/Businessmain";
@@ -47,13 +47,15 @@ import DashboardView from "./pages/DashboardView";
 import Homes from "./pages/Homes";
 import Navbar from "./components/Navbar";
 import AutoDashboard from "./pages/AutoDashboard";
+import ExcelDataManager from "./pages/ExcelDataManager";
+
 export default function App() {
   return (
     <Routes>
       <Route path="/" element={<Navbar />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
-      <Route path="/dashboard" element={<Dashboard />} />
+
       <Route path="templates" element={<Templates />} />
       <Route path="/Homes" element={<Homes />} />
       <Route path="/homes" element={<Homes />} />
@@ -79,6 +81,7 @@ export default function App() {
 
       <Route path="/dashboard" element={<DashboardView />} />
       <Route path="/auto-dashboard" element={<AutoDashboard />} />
+      <Route path="/excel-data-manager" element={<ExcelDataManager />} />
     </Routes>
   );
 }

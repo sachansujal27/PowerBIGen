@@ -1,13 +1,40 @@
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 export default function Login() {
   const navigate = useNavigate();
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    navigate("/dashboard");
+  const [login, setLogin] = useState({
+    username: "",
+    password: "",
+  });
+
+  const handleChange = (e) => {
+    setLogin({
+      ...login,
+      [e.target.name]: e.target.value,
+    });
   };
 
+  const handleLogin = async (e) => {
+    e.preventDefault();
+
+    try {
+      const res = await axios.post("http://127.0.0.1:8000/api/login/", login);
+
+      alert(res.data.message);
+
+      // If your backend returns a token
+      if (res.data.token) {
+        localStorage.setItem("token", res.data.token);
+      }
+
+      navigate("/");
+    } catch (err) {
+      alert(err.response?.data?.error || "Invalid Username or Password");
+    }
+  };
   return (
     <div className="relative min-h-screen overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900 flex items-center justify-center">
       {/* Background Glow */}
@@ -87,45 +114,55 @@ export default function Login() {
         <p className="text-center text-gray-300 mt-2 mb-8">
           Access dashboards, reports and insights
         </p>
-
-        {/* Email */}
+        {/* Username */}
         <div className="mb-4">
           <input
-            type="email"
-            placeholder="Email Address"
+            type="text"
+            name="username"
+            placeholder="Username"
+            value={login.username}
+            onChange={handleChange}
             required
             className="
-              w-full
-              p-4
-              rounded-xl
-              bg-white/10
-              border border-white/20
-              text-white
-              placeholder-gray-400
-              outline-none
-              focus:border-yellow-400
-            "
+      w-full
+      p-4
+      rounded-xl
+      bg-white/10
+      border border-white/20
+      text-white
+      placeholder-gray-400
+      outline-none
+      focus:border-yellow-400
+    "
           />
         </div>
 
+        {/* Email */}
+        <div className="mb-4"></div>
+
         {/* Password */}
         <div className="mb-4">
-          <input
-            type="password"
-            placeholder="Password"
-            required
-            className="
-              w-full
-              p-4
-              rounded-xl
-              bg-white/10
-              border border-white/20
-              text-white
-              placeholder-gray-400
-              outline-none
-              focus:border-yellow-400
-            "
-          />
+          <div className="mb-4">
+            <input
+              type="password"
+              name="password"
+              placeholder="Password"
+              value={login.password}
+              onChange={handleChange}
+              required
+              className="
+      w-full
+      p-4
+      rounded-xl
+      bg-white/10
+      border border-white/20
+      text-white
+      placeholder-gray-400
+      outline-none
+      focus:border-yellow-400
+    "
+            />
+          </div>
         </div>
 
         {/* Remember */}

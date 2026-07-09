@@ -40,6 +40,7 @@ INSTALLED_APPS = [
         'rest_framework',
     'corsheaders',
     'dashboard',
+      "records"
     
 ]
 
@@ -153,3 +154,8 @@ EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 DEFAULT_FROM_EMAIL = "sachansujal27@gmail.com"
 
 BREVO_API_KEY = os.getenv("BREVO_API_KEY")
+
+
+# Business rules for bulk data entry
+MIN_RECORDS_PER_BATCH = 100
+MAX_RECORDS_PER_BATCH = 10000
