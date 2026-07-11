@@ -23,16 +23,15 @@ export default function Login() {
     try {
       const res = await axios.post("http://127.0.0.1:8000/api/login/", login);
 
-      alert(res.data.message);
+      console.log(res.data);
 
-      // If your backend returns a token
-      if (res.data.token) {
-        localStorage.setItem("token", res.data.token);
-      }
+      localStorage.setItem("isLoggedIn", "true");
+
+      console.log("Stored:", localStorage.getItem("isLoggedIn"));
 
       navigate("/");
     } catch (err) {
-      alert(err.response?.data?.error || "Invalid Username or Password");
+      console.log(err);
     }
   };
   return (
@@ -86,7 +85,9 @@ export default function Login() {
         className="
           relative
           z-10
-          w-[420px]
+         w-full
+max-w-md
+mx-4
           bg-white/10
           backdrop-blur-2xl
           border

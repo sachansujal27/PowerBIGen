@@ -1,3 +1,4 @@
+import { Navigate, useNavigate } from "react-router-dom";
 import FileUpload from "../components/FileUpload";
 
 import {
@@ -10,6 +11,7 @@ import {
 } from "lucide-react";
 
 function Home({ setTemplates }) {
+  const navigate = useNavigate();
   return (
     <div className="min-h-screen bg-[#030712] text-white overflow-hidden">
       {/* Background Effects */}
@@ -51,11 +53,17 @@ function Home({ setTemplates }) {
           </p>
 
           <div className="mt-10 flex flex-wrap justify-center gap-4">
-            <button className="bg-yellow-400 text-black font-bold px-8 py-4 rounded-xl hover:scale-105 transition-all duration-300">
+            <button
+              className="bg-yellow-400 text-black font-bold px-8 py-4 rounded-xl hover:scale-105 transition-all duration-300 "
+              onClick={() => navigate("/register")}
+            >
               Start Generating
             </button>
 
-            <button className="border border-white/20 px-8 py-4 rounded-xl hover:bg-white/5 transition">
+            <button
+              className="border border-white/20 px-8 py-4 rounded-xl hover:bg-amber-300 transition"
+              onClick={() => navigate("/Herovideo")}
+            >
               View Demo
             </button>
           </div>

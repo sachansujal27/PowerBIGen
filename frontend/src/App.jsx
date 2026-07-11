@@ -48,6 +48,7 @@ import Homes from "./pages/Homes";
 import Navbar from "./components/Navbar";
 import AutoDashboard from "./pages/AutoDashboard";
 import ExcelDataManager from "./pages/ExcelDataManager";
+import HeroVideo from "./pages/HeroVideo";
 
 export default function App() {
   return (
@@ -55,8 +56,10 @@ export default function App() {
       <Route path="/" element={<Navbar />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/Herovideo" element={<HeroVideo />} />
 
       <Route path="templates" element={<Templates />} />
+
       <Route path="/Homes" element={<Homes />} />
       <Route path="/homes" element={<Homes />} />
 

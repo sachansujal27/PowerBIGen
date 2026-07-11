@@ -9,10 +9,30 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
+  const checkLogin = (path) => {
+    const isLoggedIn = sessionStorage.getItem("isLoggedIn");
+    sessionStorage.setItem("isLoggedIn", "true");
+    console.log(isLoggedIn);
+
+    if (isLoggedIn === "true") {
+      setShowLogin(false);
+      navigate(path);
+    } else {
+      setShowLogin(true);
+    }
+  };
+  const logout = () => {
+    localStorage.removeItem("isLoggedIn");
+    navigate("/");
+  };
   return (
     <div>
       {/* Navbar */}
-      <nav className="fixed top-0 left-0 right-0 z-50 h-20 bg-[#111827]/90 backdrop-blur-xl border-b border-white/10 flex items-center justify-between px-8">
+      <nav
+        className="fixed top-0 left-0 right-0 z-50 h-16 md:h-20
+
+px-4 md:px-8 bg-[#111827]/90 backdrop-blur-xl border-b border-white/10 flex items-center justify-between lg:px-8"
+      >
         {/* Background Glow */}
         <div className="absolute left-0 top-0 w-72 h-20 bg-yellow-400/10 blur-3xl pointer-events-none"></div>
 
@@ -27,7 +47,7 @@ export default function Navbar() {
           </div>
 
           <div>
-            <h1 className="text-2xl font-bold text-white">
+            <h1 className="text-lg sm:text-xl md:text-2xl font-bold  text-white">
               PowerBI
               <span className="text-yellow-400">Gen</span>
             </h1>
@@ -42,14 +62,14 @@ export default function Navbar() {
         <div className="hidden lg:flex items-center gap-10">
           <button
             className="group relative text-slate-300 hover:text-white transition "
-            onClick={() => navigate("/SupportPage")}
+            onClick={() => checkLogin("/SupportPage")}
           >
             Reports
             <span className="absolute left-0 -bottom-2 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
           </button>
           <button
             className="group relative text-slate-300 hover:text-white transition "
-            onClick={() => navigate("/auto-dashboard")}
+            onClick={() => checkLogin("/auto-dashboard")}
           >
             Auto Dashboard
             <span className="absolute left-0 -bottom-2 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
@@ -57,9 +77,16 @@ export default function Navbar() {
 
           <button
             className="group relative text-slate-300 hover:text-white transition"
-            onClick={() => navigate("/Homes")}
+            onClick={() => checkLogin("/Homes")}
           >
             Data Sources
+            <span className="absolute left-0 -bottom-2 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
+          </button>
+          <button
+            className="group relative text-slate-300 hover:text-white transition"
+            onClick={() => checkLogin("/templates")}
+          >
+            Template
             <span className="absolute left-0 -bottom-2 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
           </button>
         </div>
@@ -78,7 +105,10 @@ export default function Navbar() {
 
           {/* Sign In */}
           <button
-            onClick={() => navigate("/login")}
+            onClick={() => {
+              setShowLogin(false);
+              navigate("/login");
+            }}
             className="text-slate-300 hover:text-white font-medium transition"
           >
             Sign In
@@ -125,7 +155,13 @@ export default function Navbar() {
         }`}
             >
               <div className="p-5 space-y-4">
-                <div className="flex gap-4 p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition cursor-pointer">
+                <div
+                  className="flex
+flex-col
+sm:flex-row
+gap-4
+p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition cursor-pointer"
+                >
                   <div className="w-12 h-12 rounded-xl bg-yellow-400 flex items-center justify-center text-xl">
                     🚀
                   </div>
@@ -174,7 +210,7 @@ export default function Navbar() {
           {/* -----Excel Button */}
           {/* -----Excel Button */}
           <button
-            onClick={() => navigate("/excel-data-manager")}
+            onClick={() => checkLogin("/excel-data-manager")}
             className="
 bg-gradient-to-r
 from-cyan-500
@@ -217,6 +253,37 @@ gap-2
           </button>
         </div>
       </nav>
+      {showLogin && (
+        <div className="fixed inset-0 bg-black/70 z-[9999] flex items-center justify-center">
+          <div className="bg-slate-900 p-8 rounded-2xl w-[400px] border border-yellow-400">
+            <h2 className="text-3xl text-white font-bold text-center">
+              Login Required
+            </h2>
+
+            <p className="text-gray-300 text-center mt-4">
+              Please Login or Register first.
+            </p>
+
+            <button
+              onClick={() => navigate("/login")}
+              className="w-full mt-6 py-3 rounded-xl bg-yellow-400 font-bold"
+            >
+              Login
+            </button>
+
+            <button
+              onClick={() => {
+                setShowLogin(false);
+                navigate("/register");
+              }}
+              className="w-full mt-4 py-3 rounded-xl bg-blue-600 text-white"
+            >
+              Register
+            </button>
+          </div>
+        </div>
+      )}
+
       <Home />
     </div>
   );
