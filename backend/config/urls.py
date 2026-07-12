@@ -20,7 +20,20 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
+    # Admin
     path("admin/", admin.site.urls),
+
+    # Existing APIs
     path("api/", include("dashboard.urls")),
-      path("api/", include("records.urls")),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    path("api/", include("records.urls")),
+
+    # Report Generator APIs
+    path("api/report/", include("report_generator.urls")),
+]
+
+# Serve uploaded media files during development
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL,
+        document_root=settings.MEDIA_ROOT,
+    )

@@ -89,6 +89,13 @@ px-4 md:px-8 bg-[#111827]/90 backdrop-blur-xl border-b border-white/10 flex item
             Template
             <span className="absolute left-0 -bottom-2 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
           </button>
+          <button
+            className="group relative text-slate-300 hover:text-white transition"
+            onClick={() => checkLogin("/report-generator")}
+          >
+            Report Generator
+            <span className="absolute left-0 -bottom-2 h-0.5 w-0 bg-yellow-400 transition-all duration-300 group-hover:w-full"></span>
+          </button>
         </div>
 
         {/* Right Side */}

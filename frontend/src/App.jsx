@@ -49,6 +49,7 @@ import Navbar from "./components/Navbar";
 import AutoDashboard from "./pages/AutoDashboard";
 import ExcelDataManager from "./pages/ExcelDataManager";
 import HeroVideo from "./pages/HeroVideo";
+import ReportGenerator from "./pages/ReportGenerator";
 
 export default function App() {
   return (
@@ -85,6 +86,8 @@ export default function App() {
       <Route path="/dashboard" element={<DashboardView />} />
       <Route path="/auto-dashboard" element={<AutoDashboard />} />
       <Route path="/excel-data-manager" element={<ExcelDataManager />} />
+
+      <Route path="/report-generator" element={<ReportGenerator />} />
     </Routes>
   );
 }

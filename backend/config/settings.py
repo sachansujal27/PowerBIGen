@@ -40,7 +40,9 @@ INSTALLED_APPS = [
         'rest_framework',
     'corsheaders',
     'dashboard',
-      "records"
+      "records",
+     "report_generator",
+   
     
 ]
 
@@ -159,3 +161,7 @@ BREVO_API_KEY = os.getenv("BREVO_API_KEY")
 # Business rules for bulk data entry
 MIN_RECORDS_PER_BATCH = 100
 MAX_RECORDS_PER_BATCH = 10000
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
