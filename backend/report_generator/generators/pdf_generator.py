@@ -1,6 +1,6 @@
 from reportlab.lib import colors
 from reportlab.lib.styles import getSampleStyleSheet
-from reportlab.lib.units import inch
+from reportlab.lib.enums import TA_CENTER
 from reportlab.platypus import (
     SimpleDocTemplate,
     Paragraph,
@@ -9,391 +9,250 @@ from reportlab.platypus import (
     TableStyle,
     PageBreak,
 )
-from reportlab.lib.enums import TA_CENTER
-from reportlab.pdfbase import pdfmetrics
+from reportlab.lib.units import inch
 
 
 class PDFReportGenerator:
 
-    def __init__(self, report_data, output_path):
-        self.report = report_data
+    def __init__(self, report, output_path):
+        self.report = report
         self.output_path = output_path
-        self.styles = getSampleStyleSheet()
-
-        self.title_style = self.styles["Heading1"]
-        self.title_style.alignment = TA_CENTER
-
-        self.heading_style = self.styles["Heading2"]
-        self.normal_style = self.styles["BodyText"]
-
-    # -------------------------------------------------------
-    # Dataset Table
-    # -------------------------------------------------------
-
-    def dataset_table(self):
-
-        info = self.report["dataset_information"]
-
-        data = [
-            ["Metric", "Value"]
-        ]
-
-        for key, value in info.items():
-            data.append([key, str(value)])
-
-        table = Table(
-            data,
-            colWidths=[3 * inch, 3 * inch]
-        )
-
-        table.setStyle(
-
-            TableStyle(
-
-                [
-
-                    ("BACKGROUND", (0, 0), (-1, 0), colors.darkblue),
-
-                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-
-                    ("GRID", (0, 0), (-1, -1), 1, colors.black),
-
-                    ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
-
-                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-
-                    ("BOTTOMPADDING", (0, 0), (-1, 0), 10),
-
-                    ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-
-                ]
-
-            )
-
-        )
-
-        return table
-
-    # -------------------------------------------------------
-    # KPI Table
-    # -------------------------------------------------------
-
-    def kpi_table(self):
-
-        kpis = self.report.get("kpis", [])
-
-        if len(kpis) == 0:
-
-            return Paragraph(
-                "No KPI information available.",
-                self.normal_style
-            )
-
-        data = [[
-            "Metric",
-            "Total",
-            "Average",
-            "Maximum",
-            "Minimum"
-        ]]
-
-        for item in kpis:
-
-            data.append([
-
-                item["metric"],
-
-                str(item["total"]),
-
-                str(item["average"]),
-
-                str(item["maximum"]),
-
-                str(item["minimum"])
-
-            ])
-
-        table = Table(data)
-
-        table.setStyle(
-
-            TableStyle(
-
-                [
-
-                    ("BACKGROUND", (0, 0), (-1, 0), colors.green),
-
-                    ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
-
-                    ("GRID", (0, 0), (-1, -1), 1, colors.black),
-
-                    ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
-
-                    ("ALIGN", (0, 0), (-1, -1), "CENTER"),
-
-                    ("BACKGROUND", (0, 1), (-1, -1), colors.whitesmoke),
-
-                ]
-
-            )
-
-        )
-
-        return table
-
-    # -------------------------------------------------------
-    # Bullet List
-    # -------------------------------------------------------
-
-    def bullet_list(self, items):
-
-        elements = []
-
-        for item in items:
-
-            elements.append(
-
-                Paragraph(
-                    f"• {item}",
-                    self.normal_style
-                )
-
-            )
-
-        return elements
-
-    # -------------------------------------------------------
-    # Generate PDF
-    # -------------------------------------------------------
 
     def generate(self):
 
         doc = SimpleDocTemplate(
-            self.output_path
+            self.output_path,
+            rightMargin=40,
+            leftMargin=40,
+            topMargin=40,
+            bottomMargin=40,
         )
 
-        elements = []
+        styles = getSampleStyleSheet()
 
-        # -------------------------
-        # Page 1
-        # -------------------------
+        title = styles["Title"]
+        title.alignment = TA_CENTER
 
-        elements.append(
+        heading = styles["Heading1"]
+        heading.textColor = colors.HexColor("#0F4C81")
+
+        subheading = styles["Heading2"]
+        subheading.textColor = colors.HexColor("#1E88E5")
+
+        normal = styles["BodyText"]
+
+        story = []
+
+        # ---------------------------------------------------
+        # COVER PAGE
+        # ---------------------------------------------------
+
+        story.append(Paragraph("Business Analysis Report", title))
+        story.append(Spacer(1, 15))
+
+        story.append(
             Paragraph(
-                self.report["title"],
-                self.title_style
+                "<b>AI Generated Business Intelligence Report</b>",
+                normal,
             )
         )
 
-        elements.append(
-            Spacer(1, 0.3 * inch)
-        )
+        story.append(Spacer(1, 10))
 
-        elements.append(
+        story.append(
             Paragraph(
-                "<b>Generated Date:</b> "
-                + self.report["generated_date"],
-                self.normal_style,
+                f"<b>Date:</b> {self.report.get('generated_date','')}",
+                normal,
             )
         )
 
-        elements.append(
-            Spacer(1, 0.2 * inch)
-        )
+        story.append(Spacer(1, 25))
 
-        elements.append(
+        story.append(Paragraph("Executive Summary", heading))
+
+        story.append(
             Paragraph(
-                "Executive Summary",
-                self.heading_style,
+                self.report.get(
+                    "executive_summary",
+                    "No summary available.",
+                ),
+                normal,
             )
         )
 
-        elements.append(
+        story.append(PageBreak())
 
-            Paragraph(
+        # ---------------------------------------------------
+        # DATASET INFORMATION
+        # ---------------------------------------------------
 
-                self.report["executive_summary"],
+        story.append(Paragraph("Dataset Information", heading))
+        story.append(Spacer(1, 12))
 
-                self.normal_style,
+        info = self.report.get("dataset_information", {})
 
-            )
+        table_data = [
+            ["Property", "Value"]
+        ]
 
+        for key, value in info.items():
+            table_data.append([str(key), str(value)])
+
+        table = Table(table_data, colWidths=[220, 220])
+
+        table.setStyle(
+            TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), colors.HexColor("#0F4C81")),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+
+                ("GRID", (0, 0), (-1, -1), 1, colors.grey),
+
+                ("BACKGROUND", (0, 1), (-1, -1), colors.whitesmoke),
+
+                ("FONTNAME", (0, 0), (-1, 0), "Helvetica-Bold"),
+
+                ("BOTTOMPADDING", (0, 0), (-1, 0), 10),
+
+                ("TOPPADDING", (0, 1), (-1, -1), 8),
+
+                ("BOTTOMPADDING", (0, 1), (-1, -1), 8),
+            ])
         )
 
-        elements.append(
-            Spacer(1, 0.25 * inch)
-        )
+        story.append(table)
 
-        elements.append(
+        story.append(Spacer(1, 25))
 
-            Paragraph(
+        # ---------------------------------------------------
+        # KPI
+        # ---------------------------------------------------
 
-                "Dataset Overview",
+        story.append(Paragraph("Key Performance Indicators", heading))
+        story.append(Spacer(1, 10))
 
-                self.heading_style
+        kpis = self.report.get("kpis", [])
 
-            )
+        if kpis:
 
-        )
+            kpi_table = [["KPI", "Value"]]
 
-        elements.append(
-            self.dataset_table()
-        )
+            for item in kpis:
+                kpi_table.append([
+                    item.get("title", ""),
+                    str(item.get("value", "")),
+                ])
 
-        elements.append(
-            Spacer(1, 0.3 * inch)
-        )
+            table = Table(kpi_table, colWidths=[220, 220])
 
-        elements.append(
-            Paragraph(
-                "KPI Summary",
-                self.heading_style
-            )
-        )
+            table.setStyle(TableStyle([
+                ("BACKGROUND", (0, 0), (-1, 0), colors.darkblue),
+                ("TEXTCOLOR", (0, 0), (-1, 0), colors.white),
+                ("GRID", (0, 0), (-1, -1), 1, colors.black),
+                ("BACKGROUND", (0, 1), (-1, -1), colors.beige),
+            ]))
 
-        elements.append(
-            self.kpi_table()
-        )
+            story.append(table)
 
-        elements.append(PageBreak())
-                # -------------------------------------------------
-        # PAGE 2
-        # -------------------------------------------------
+        story.append(PageBreak())
 
-        # Business Insights
-        elements.append(
-            Paragraph(
-                "Business Insights",
-                self.heading_style
-            )
-        )
+        # ---------------------------------------------------
+        # BUSINESS INSIGHTS
+        # ---------------------------------------------------
+
+        story.append(Paragraph("Business Findings", heading))
+
+        story.append(Spacer(1, 10))
 
         insights = self.report.get("insights", [])
 
         if insights:
-            elements.extend(self.bullet_list(insights))
-        else:
-            elements.append(
-                Paragraph(
-                    "No business insights available.",
-                    self.normal_style,
-                )
+
+            for item in insights:
+
+                if isinstance(item, dict):
+
+                    txt = (
+                        f"<b>{item.get('column')}</b><br/>"
+                        f"Total : {item.get('total')}<br/>"
+                        f"Average : {item.get('average')}<br/>"
+                        f"Maximum : {item.get('maximum')}<br/>"
+                        f"Minimum : {item.get('minimum')}"
+                    )
+
+                else:
+
+                    txt = str(item)
+
+                story.append(Paragraph(txt, normal))
+                story.append(Spacer(1, 8))
+
+        story.append(Spacer(1, 20))
+
+        # ---------------------------------------------------
+        # RISKS
+        # ---------------------------------------------------
+
+        story.append(Paragraph("Business Risks", subheading))
+
+        for risk in self.report.get("risks", []):
+
+            story.append(
+                Paragraph(f"• {risk}", normal)
             )
 
-        elements.append(
-            Spacer(1, 0.25 * inch)
-        )
+        story.append(Spacer(1, 20))
 
-        # Risks
-        elements.append(
-            Paragraph(
-                "Potential Risks",
-                self.heading_style
-            )
-        )
+        # ---------------------------------------------------
+        # OPPORTUNITIES
+        # ---------------------------------------------------
 
-        risks = self.report.get("risks", [])
+        story.append(Paragraph("Business Opportunities", subheading))
 
-        if risks:
-            elements.extend(self.bullet_list(risks))
-        else:
-            elements.append(
-                Paragraph(
-                    "No major risks detected.",
-                    self.normal_style,
-                )
+        for item in self.report.get("opportunities", []):
+
+            story.append(
+                Paragraph(f"• {item}", normal)
             )
 
-        elements.append(
-            Spacer(1, 0.25 * inch)
-        )
+        story.append(Spacer(1, 20))
 
-        # Opportunities
-        elements.append(
-            Paragraph(
-                "Business Opportunities",
-                self.heading_style
-            )
-        )
+        # ---------------------------------------------------
+        # RECOMMENDATIONS
+        # ---------------------------------------------------
 
-        opportunities = self.report.get(
-            "opportunities",
-            []
-        )
+        story.append(Paragraph("Recommendations", heading))
 
-        if opportunities:
-            elements.extend(
-                self.bullet_list(opportunities)
+        for rec in self.report.get("recommendations", []):
+
+            story.append(
+                Paragraph(f"• {rec}", normal)
             )
 
-        elements.append(
-            Spacer(1, 0.25 * inch)
-        )
+        story.append(Spacer(1, 25))
 
-        # Recommendations
-        elements.append(
-            Paragraph(
-                "Recommendations",
-                self.heading_style
-            )
-        )
+        # ---------------------------------------------------
+        # CONCLUSION
+        # ---------------------------------------------------
 
-        recommendations = self.report.get(
-            "recommendations",
-            []
-        )
+        story.append(Paragraph("Conclusion", heading))
 
-        if recommendations:
-            elements.extend(
-                self.bullet_list(recommendations)
-            )
-
-        elements.append(
-            Spacer(1, 0.3 * inch)
-        )
-
-        # Conclusion
-        elements.append(
-            Paragraph(
-                "Conclusion",
-                self.heading_style
-            )
-        )
-
-        elements.append(
+        story.append(
             Paragraph(
                 self.report.get(
                     "conclusion",
-                    "Business report generated successfully."
+                    "Business analysis completed successfully.",
                 ),
-                self.normal_style
+                normal,
             )
         )
 
-        elements.append(
-            Spacer(1, 0.4 * inch)
-        )
+        story.append(Spacer(1, 30))
 
-        # Footer
-        footer = (
-            "<font size='9'>"
-            "<b>Generated by:</b> AI Business Report Generator"
-            "<br/>"
-            f"<b>Date:</b> {self.report['generated_date']}"
-            "</font>"
-        )
-
-        elements.append(
+        story.append(
             Paragraph(
-                footer,
-                self.normal_style
+                "<font color='grey'>Generated by PowerBIGen</font>",
+                styles["Italic"],
             )
         )
 
-        # -------------------------------------------------
-        # Build PDF
-        # -------------------------------------------------
-
-        doc.build(elements)
-
-        return self.output_path
+        doc.build(story)

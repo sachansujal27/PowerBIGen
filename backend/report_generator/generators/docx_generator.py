@@ -1,251 +1,254 @@
 from docx import Document
-from docx.shared import Pt
-from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
+from docx.shared import Pt, RGBColor
+from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 
 class DOCXReportGenerator:
 
-    def __init__(self, report_data, output_path):
-        self.report = report_data
+    def __init__(self, report, output_path):
+        self.report = report
         self.output_path = output_path
-        self.document = Document()
 
-    # ----------------------------------------
-    # Title
-    # ----------------------------------------
+    def add_heading(self, document, text, level=1):
 
-    def add_title(self):
+        heading = document.add_heading("", level=level)
 
-        heading = self.document.add_heading(
-            self.report["title"],
-            level=1
+        run = heading.add_run(text)
+        run.bold = True
+        run.font.color.rgb = RGBColor(0, 70, 140)
+
+    def generate(self):
+
+        document = Document()
+
+        # -------------------------
+        # Title
+        # -------------------------
+
+        title = document.add_heading("", level=0)
+
+        title.alignment = WD_ALIGN_PARAGRAPH.CENTER
+
+        run = title.add_run("Business Analysis Report")
+
+        run.bold = True
+        run.font.size = Pt(24)
+        run.font.color.rgb = RGBColor(0, 70, 140)
+
+        document.add_paragraph(
+            "AI Generated Business Intelligence Report"
         )
 
-        heading.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-
-        p = self.document.add_paragraph()
-
-        p.add_run("Generated Date: ").bold = True
-
-        p.add_run(
-            self.report["generated_date"]
+        document.add_paragraph(
+            f"Generated Date : {self.report.get('generated_date','')}"
         )
 
-    # ----------------------------------------
-    # Executive Summary
-    # ----------------------------------------
+        document.add_page_break()
 
-    def executive_summary(self):
+        # -------------------------
+        # Executive Summary
+        # -------------------------
 
-        self.document.add_heading(
-            "Executive Summary",
-            level=2
+        self.add_heading(document, "Executive Summary")
+
+        document.add_paragraph(
+            self.report.get(
+                "executive_summary",
+                "No executive summary available."
+            )
         )
 
-        self.document.add_paragraph(
-            self.report["executive_summary"]
+        # -------------------------
+        # Dataset Information
+        # -------------------------
+
+        self.add_heading(document, "Dataset Information")
+
+        info = self.report.get(
+            "dataset_information",
+            {}
         )
 
-    # ----------------------------------------
-    # Dataset Information
-    # ----------------------------------------
-
-    def dataset_information(self):
-
-        self.document.add_heading(
-            "Dataset Overview",
-            level=2
-        )
-
-        table = self.document.add_table(
+        table = document.add_table(
             rows=1,
             cols=2
         )
 
         table.style = "Table Grid"
 
-        header = table.rows[0].cells
+        hdr = table.rows[0].cells
 
-        header[0].text = "Metric"
-        header[1].text = "Value"
+        hdr[0].text = "Property"
+        hdr[1].text = "Value"
 
-        for key, value in self.report[
-            "dataset_information"
-        ].items():
+        for key, value in info.items():
 
             row = table.add_row().cells
 
             row[0].text = str(key)
             row[1].text = str(value)
 
-    # ----------------------------------------
-    # KPI Table
-    # ----------------------------------------
+        # -------------------------
+        # KPI
+        # -------------------------
 
-    def kpi_table(self):
-
-        self.document.add_heading(
-            "KPI Summary",
-            level=2
-        )
+        self.add_heading(document, "Key Performance Indicators")
 
         kpis = self.report.get(
             "kpis",
             []
         )
 
-        if len(kpis) == 0:
+        if len(kpis):
 
-            self.document.add_paragraph(
-                "No KPI information available."
+            table = document.add_table(
+                rows=1,
+                cols=2
             )
 
-            return
+            table.style = "Colorful Grid"
 
-        table = self.document.add_table(
-            rows=1,
-            cols=5
+            hdr = table.rows[0].cells
+
+            hdr[0].text = "KPI"
+            hdr[1].text = "Value"
+
+            for item in kpis:
+
+                row = table.add_row().cells
+
+                row[0].text = item.get(
+                    "title",
+                    ""
+                )
+
+                row[1].text = str(
+                    item.get(
+                        "value",
+                        ""
+                    )
+                )
+
+        document.add_page_break()
+
+        # -------------------------
+        # Business Findings
+        # -------------------------
+
+        self.add_heading(document, "Business Findings")
+
+        insights = self.report.get(
+            "insights",
+            []
         )
 
-        table.style = "Table Grid"
+        for item in insights:
 
-        hdr = table.rows[0].cells
+            if isinstance(item, dict):
 
-        hdr[0].text = "Metric"
-        hdr[1].text = "Total"
-        hdr[2].text = "Average"
-        hdr[3].text = "Maximum"
-        hdr[4].text = "Minimum"
+                p = document.add_paragraph(style="List Bullet")
 
-        for item in kpis:
+                p.add_run(
+                    f"{item.get('column')} : "
+                ).bold = True
 
-            row = table.add_row().cells
+                p.add_run(
+                    f"Total = {item.get('total')}, "
+                    f"Average = {item.get('average')}, "
+                    f"Maximum = {item.get('maximum')}, "
+                    f"Minimum = {item.get('minimum')}"
+                )
 
-            row[0].text = item["metric"]
-            row[1].text = str(item["total"])
-            row[2].text = str(item["average"])
-            row[3].text = str(item["maximum"])
-            row[4].text = str(item["minimum"])
-                # ----------------------------------------
-    # Bullet List Section
-    # ----------------------------------------
+            else:
 
-    def add_bullet_section(self, heading, items):
+                document.add_paragraph(
+                    str(item),
+                    style="List Bullet"
+                )
 
-        self.document.add_heading(
-            heading,
-            level=2
-        )
+        # -------------------------
+        # Risks
+        # -------------------------
 
-        if not items:
-            self.document.add_paragraph(
-                "No information available."
+        self.add_heading(document, "Business Risks")
+
+        for risk in self.report.get(
+            "risks",
+            []
+        ):
+
+            document.add_paragraph(
+                risk,
+                style="List Bullet"
             )
-            return
 
-        for item in items:
-            self.document.add_paragraph(
+        # -------------------------
+        # Opportunities
+        # -------------------------
+
+        self.add_heading(document, "Business Opportunities")
+
+        for item in self.report.get(
+            "opportunities",
+            []
+        ):
+
+            document.add_paragraph(
                 item,
                 style="List Bullet"
             )
 
-    # ----------------------------------------
-    # Conclusion
-    # ----------------------------------------
+        # -------------------------
+        # Recommendations
+        # -------------------------
 
-    def conclusion(self):
+        self.add_heading(document, "Recommendations")
 
-        self.document.add_heading(
-            "Conclusion",
-            level=2
-        )
+        for rec in self.report.get(
+            "recommendations",
+            []
+        ):
 
-        self.document.add_paragraph(
+            document.add_paragraph(
+                rec,
+                style="List Bullet"
+            )
+
+        # -------------------------
+        # Conclusion
+        # -------------------------
+
+        self.add_heading(document, "Conclusion")
+
+        document.add_paragraph(
             self.report.get(
                 "conclusion",
-                "Business report generated successfully."
+                ""
             )
         )
 
-    # ----------------------------------------
-    # Footer
-    # ----------------------------------------
+        document.add_page_break()
 
-    def footer(self):
+        # -------------------------
+        # Footer
+        # -------------------------
 
-        self.document.add_paragraph()
+        p = document.add_paragraph()
 
-        footer = self.document.add_paragraph()
+        p.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
-        footer.alignment = (
-            WD_PARAGRAPH_ALIGNMENT.CENTER
+        run = p.add_run(
+            "Generated by PowerBIGen"
         )
 
-        run = footer.add_run(
-            "Generated by AI Business Report Generator"
+        run.italic = True
+        run.font.size = Pt(11)
+        run.font.color.rgb = RGBColor(
+            120,
+            120,
+            120
         )
 
-        run.bold = True
-        run.font.size = Pt(10)
-
-        footer.add_run("\n")
-
-        footer.add_run(
-            self.report["generated_date"]
-        ).font.size = Pt(9)
-
-    # ----------------------------------------
-    # Generate Word Report
-    # ----------------------------------------
-
-    def generate(self):
-
-        self.add_title()
-
-        self.executive_summary()
-
-        self.dataset_information()
-
-        self.kpi_table()
-
-        self.add_bullet_section(
-            "Business Insights",
-            self.report.get(
-                "insights",
-                []
-            )
-        )
-
-        self.add_bullet_section(
-            "Potential Risks",
-            self.report.get(
-                "risks",
-                []
-            )
-        )
-
-        self.add_bullet_section(
-            "Business Opportunities",
-            self.report.get(
-                "opportunities",
-                []
-            )
-        )
-
-        self.add_bullet_section(
-            "Recommendations",
-            self.report.get(
-                "recommendations",
-                []
-            )
-        )
-
-        self.conclusion()
-
-        self.footer()
-
-        self.document.save(
+        document.save(
             self.output_path
         )
-
-        return self.output_path

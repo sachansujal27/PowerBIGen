@@ -36,148 +36,148 @@ export default function ReportPreview({ report }) {
     <div className="mt-10 space-y-10">
       {/* PAGE 1 COVER */}
 
-      <div className="bg-white text-black rounded-2xl p-10 shadow-xl">
-        <h1 className="text-4xl font-bold">Business Intelligence Report</h1>
+      <div className="rounded-2xl bg-white p-10 text-black shadow-xl border">
+        <h1 className="text-4xl font-bold text-blue-700 border-b-4 border-blue-700 pb-3">
+          {report.title || "Business Analysis Report"}
+        </h1>
 
-        <p className="text-gray-500 mt-2">
-          AI Generated Business Analysis Report
+        <p className="mt-2 text-gray-500">
+          Generated on {report.generated_date}
         </p>
 
-        <hr className="my-8" />
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold text-blue-700 border-b pb-2">
+            Executive Summary
+          </h2>
 
-        <h2 className="text-2xl font-bold">Executive Summary</h2>
-
-        <p className="mt-4 text-gray-700">
-          This report provides automated analysis of uploaded business data. The
-          system analyzed sales, performance metrics, and generated actionable
-          insights.
-        </p>
-
-        <div className="grid grid-cols-3 gap-5 mt-8">
-          <div className="p-5 rounded-xl bg-blue-100">
-            <h3 className="text-gray-600">Total Records</h3>
-
-            <p className="text-3xl font-bold">{summary.rows}</p>
-          </div>
-
-          <div className="p-5 rounded-xl bg-green-100">
-            <h3>Total Columns</h3>
-
-            <p className="text-3xl font-bold">{summary.columns}</p>
-          </div>
-
-          <div className="p-5 rounded-xl bg-yellow-100">
-            <h3>Numeric Metrics</h3>
-
-            <p className="text-3xl font-bold">
-              {summary.numeric_columns?.length}
-            </p>
-          </div>
+          <p className="mt-4 leading-8 text-justify">
+            {report.executive_summary}
+          </p>
         </div>
+      </div>
+      <div className="mt-8">
+        <h2 className="text-2xl font-bold text-blue-700 border-b pb-2">
+          Dataset Information
+        </h2>
 
-        <h2 className="text-2xl font-bold mt-10">Dataset Overview</h2>
-
-        <table className="w-full border mt-4">
+        <table className="w-full mt-5 border">
           <tbody>
             <tr>
-              <td className="border p-3">Rows</td>
+              <td className="border p-3 font-semibold">Rows</td>
 
-              <td className="border p-3">{summary.rows}</td>
+              <td className="border p-3">{dataset.Rows}</td>
             </tr>
 
             <tr>
-              <td className="border p-3">Columns</td>
+              <td className="border p-3 font-semibold">Columns</td>
 
-              <td className="border p-3">{summary.columns}</td>
+              <td className="border p-3">{dataset.Columns}</td>
             </tr>
 
             <tr>
-              <td className="border p-3">Categories</td>
+              <td className="border p-3 font-semibold">Missing Values</td>
 
-              <td className="border p-3">
-                {summary.categorical_columns?.join(", ")}
-              </td>
+              <td className="border p-3">{dataset["Missing Values"]}</td>
+            </tr>
+
+            <tr>
+              <td className="border p-3 font-semibold">Duplicate Rows</td>
+
+              <td className="border p-3">{dataset["Duplicate Rows"]}</td>
+            </tr>
+
+            <tr>
+              <td className="border p-3 font-semibold">Memory Usage</td>
+
+              <td className="border p-3">{dataset["Memory Usage"]}</td>
             </tr>
           </tbody>
         </table>
       </div>
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold text-blue-700 border-b pb-2">
+          Business Statistics
+        </h2>
 
-      {/* PAGE 2 ANALYSIS */}
+        <div className="space-y-6 mt-6">
+          {Object.entries(statistics).map(([column, values]) => (
+            <div key={column} className="border rounded-xl p-5 bg-blue-50">
+              <h3 className="text-xl font-bold text-blue-700">{column}</h3>
 
-      <div className="bg-white text-black rounded-2xl p-10 shadow-xl">
-        <h2 className="text-3xl font-bold">Business Performance Analysis</h2>
+              <p className="mt-2">
+                <b>Total:</b> {values.total}
+              </p>
 
-        <div className="h-[400px] mt-8">
-          <ResponsiveContainer>
-            <BarChart data={chartData}>
-              <XAxis dataKey="name" />
+              <p>
+                <b>Average:</b> {values.mean}
+              </p>
 
-              <YAxis />
+              <p>
+                <b>Maximum:</b> {values.max}
+              </p>
 
-              <Tooltip />
-
-              <Legend />
-
-              <Bar dataKey="value" fill="#2563eb" />
-            </BarChart>
-          </ResponsiveContainer>
+              <p>
+                <b>Minimum:</b> {values.min}
+              </p>
+            </div>
+          ))}
         </div>
-
-        <h2 className="text-2xl font-bold mt-10">Key Metrics</h2>
-
-        <table className="w-full border mt-5">
-          <thead>
-            <tr>
-              <th className="border p-3">Metric</th>
-
-              <th className="border p-3">Total</th>
-
-              <th className="border p-3">Average</th>
-
-              <th className="border p-3">Maximum</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            {insights.map((item, index) => (
-              <tr key={index}>
-                <td className="border p-3">{item.column}</td>
-
-                <td className="border p-3">{item.total}</td>
-
-                <td className="border p-3">{item.average}</td>
-
-                <td className="border p-3">{item.maximum}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
-
-      {/* PAGE 3 */}
-
-      <div className="bg-white text-black rounded-2xl p-10 shadow-xl">
-        <h2 className="text-3xl font-bold">Recommendations</h2>
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold text-green-700 border-b pb-2">
+          Business Insights
+        </h2>
 
         <ul className="list-disc ml-8 mt-5 space-y-3">
-          <li>Optimize low performing business areas.</li>
-
-          <li>Improve resource allocation using data insights.</li>
-
-          <li>Monitor revenue and profit trends regularly.</li>
-
-          <li>Focus on high performing products and regions.</li>
+          {insights.map((item, index) => (
+            <li key={index}>
+              {typeof item === "string" ? item : JSON.stringify(item)}
+            </li>
+          ))}
         </ul>
-
-        <h2 className="text-2xl font-bold mt-10">Conclusion</h2>
-
-        <p className="mt-3">
-          The analysis indicates important business patterns and provides
-          data-driven recommendations for future improvement.
-        </p>
-
-        <DownloadButtons />
       </div>
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold text-red-700 border-b pb-2">
+          Business Risks
+        </h2>
+
+        <ul className="list-disc ml-8 mt-5">
+          {risks.map((risk, index) => (
+            <li key={index}>{risk}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold text-red-700 border-b pb-2">
+          Business Risks
+        </h2>
+
+        <ul className="list-disc ml-8 mt-5">
+          {risks.map((risk, index) => (
+            <li key={index}>{risk}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold text-indigo-700 border-b pb-2">
+          Recommendations
+        </h2>
+
+        <ul className="list-disc ml-8 mt-5">
+          {recommendations.map((item, index) => (
+            <li key={index}>{item}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="mt-10">
+        <h2 className="text-2xl font-bold text-blue-700 border-b pb-2">
+          Conclusion
+        </h2>
+
+        <p className="mt-5 leading-8">{report.conclusion}</p>
+      </div>
+
+      <DownloadButtons />
     </div>
   );
 }

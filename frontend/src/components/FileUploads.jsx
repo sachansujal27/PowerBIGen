@@ -1,6 +1,9 @@
 import { useRef } from "react";
 
-export default function FileUpload({ file, onFileSelect }) {
+export default function FileUploads(props) {
+  console.log("FileUploads props:", props);
+
+  const { file = null, onFileSelect } = props;
   const inputRef = useRef(null);
 
   const handleFile = (f) => {

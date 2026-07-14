@@ -2,19 +2,19 @@ import { useState } from "react";
 import FileUploads from "../components/FileUploads";
 import ReportPreview from "../components/ReportPreview";
 
+const API_URL = "http://127.0.0.1:8000/api/report/upload/";
+
 export default function ReportGenerator() {
   const [file, setFile] = useState(null);
   const [loading, setLoading] = useState(false);
   const [report, setReport] = useState(null);
   const [error, setError] = useState("");
 
-  // File select
+  // Select File
   const handleFileSelect = (selectedFile) => {
     setFile(selectedFile);
     setReport(null);
     setError("");
-
-    console.log("Selected File:", selectedFile);
   };
 
   // Generate Report
@@ -29,69 +29,54 @@ export default function ReportGenerator() {
       setError("");
 
       const formData = new FormData();
-
       formData.append("file", file);
 
-      const response = await fetch("http://127.0.0.1:8000/api/report/upload/", {
+      const response = await fetch(API_URL, {
         method: "POST",
         body: formData,
       });
 
-      const data = await response.json();
+      const text = await response.text();
+
+      console.log("Backend Response:", text);
+
+      let data;
+
+      try {
+        data = JSON.parse(text);
+      } catch {
+        throw new Error(text);
+      }
 
       if (!response.ok) {
-        throw new Error(data.message || "Report generation failed");
+        throw new Error(
+          data.message || data.detail || "Failed to generate report.",
+        );
       }
 
       console.log("Generated Report:", data);
 
-      /*
-        Your API returns serializer data.
-        Convert it if required.
-      */
-
-      const formattedReport = {
-        summary: {
-          rows: data.rows,
-          columns: data.columns,
-          numeric_columns: data.numeric_columns || [],
-          categorical_columns: data.categorical_columns || [],
-        },
-
-        insights: data.insights || [],
-
-        recommendations: data.recommendations || [],
-
-        conclusion: data.conclusion || "",
-
-        executive_summary: data.executive_summary || "",
-
-        pdf_report: data.pdf_report,
-
-        docx_report: data.docx_report,
-      };
-
-      setReport(formattedReport);
+      // Save the complete response from backend
+      setReport(data);
     } catch (err) {
-      console.error("Report Error:", err);
-
-      setError(err.message);
+      console.error(err);
+      setError(err.message || "Something went wrong.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 pt-24 p-6">
+    <div className="min-h-screen bg-slate-950 pt-24 px-6 pb-10">
       <div className="mx-auto max-w-6xl">
         <h1 className="mb-8 text-4xl font-bold text-white">
-          AI Report Generator
+          AI Business Report Generator
         </h1>
 
         <FileUploads file={file} onFileSelect={handleFileSelect} />
 
         {error && (
-          <div className="mt-5 rounded-lg bg-red-900/30 p-4 text-red-400">
+          <div className="mt-6 rounded-xl border border-red-700 bg-red-900/20 p-4 text-red-300">
             {error}
           </div>
         )}
@@ -100,21 +85,23 @@ export default function ReportGenerator() {
           <button
             onClick={handleGenerateReport}
             disabled={loading}
-            className="
-            mt-6 rounded-xl 
-            bg-indigo-600 
-            px-8 py-3 
-            font-semibold 
-            text-white
-            hover:bg-indigo-700
-            disabled:opacity-50
-            "
+            className="mt-6 rounded-xl bg-indigo-600 px-8 py-3 font-semibold text-white transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            {loading ? "Generating Report..." : "Generate Dashboard Report"}
+            {loading ? "Generating Report..." : "Generate Business Report"}
           </button>
         )}
 
-        {report && <ReportPreview report={report} />}
+        {loading && (
+          <div className="mt-6 text-blue-300">
+            Analyzing file and preparing business report...
+          </div>
+        )}
+
+        {report && (
+          <div className="mt-10">
+            <ReportPreview report={report} />
+          </div>
+        )}
       </div>
     </div>
   );

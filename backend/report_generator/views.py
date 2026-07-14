@@ -20,12 +20,9 @@ class ReportUploadView(APIView):
 
     def post(self, request):
 
-        serializer = ReportUploadSerializer(
-            data=request.data
-        )
+        serializer = ReportUploadSerializer(data=request.data)
 
         if not serializer.is_valid():
-
             return Response(
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST,
@@ -39,10 +36,7 @@ class ReportUploadView(APIView):
             "uploads",
         )
 
-        os.makedirs(
-            upload_folder,
-            exist_ok=True,
-        )
+        os.makedirs(upload_folder, exist_ok=True)
 
         file_path = os.path.join(
             upload_folder,
@@ -50,44 +44,27 @@ class ReportUploadView(APIView):
         )
 
         with open(file_path, "wb+") as destination:
-
             for chunk in uploaded_file.chunks():
-
                 destination.write(chunk)
 
         class TempFile:
             pass
 
         temp = TempFile()
-
         temp.path = file_path
         temp.name = uploaded_file.name
 
         service = ReportService(temp)
 
+        # Generate Full Report
         report = service.build_report()
 
-        pdf_folder = os.path.join(
-            settings.MEDIA_ROOT,
-            "reports",
-            "pdf",
-        )
+        # Create folders
+        pdf_folder = os.path.join(settings.MEDIA_ROOT, "reports", "pdf")
+        docx_folder = os.path.join(settings.MEDIA_ROOT, "reports", "docx")
 
-        word_folder = os.path.join(
-            settings.MEDIA_ROOT,
-            "reports",
-            "docx",
-        )
-
-        os.makedirs(
-            pdf_folder,
-            exist_ok=True,
-        )
-
-        os.makedirs(
-            word_folder,
-            exist_ok=True,
-        )
+        os.makedirs(pdf_folder, exist_ok=True)
+        os.makedirs(docx_folder, exist_ok=True)
 
         pdf_path = os.path.join(
             pdf_folder,
@@ -95,19 +72,12 @@ class ReportUploadView(APIView):
         )
 
         docx_path = os.path.join(
-            word_folder,
+            docx_folder,
             uploaded_file.name + ".docx",
         )
 
-        service.generate_pdf(
-            report,
-            pdf_path,
-        )
-
-        service.generate_docx(
-            report,
-            docx_path,
-        )
+        service.generate_pdf(report, pdf_path)
+        service.generate_docx(report, docx_path)
 
         report_type = (
             "pdf"
@@ -116,65 +86,37 @@ class ReportUploadView(APIView):
         )
 
         generated = GeneratedReport.objects.create(
-
             file=f"reports/uploads/{uploaded_file.name}",
-
             file_name=uploaded_file.name,
-
             report_type=report_type,
-
-            rows=report.get(
-                "dataset_information",
-                {},
-            ).get("Rows", 0),
-
-            columns=report.get(
-                "dataset_information",
-                {},
-            ).get("Columns", 0),
-
-            missing_values=report.get(
-                "dataset_information",
-                {},
-            ).get("Missing Values", 0),
-
-            executive_summary=report.get(
-                "executive_summary",
-                "",
-            ),
-
-            insights=report.get(
-                "insights",
-                [],
-            ),
-
-            recommendations=report.get(
-                "recommendations",
-                [],
-            ),
-
-            conclusion=report.get(
-                "conclusion",
-                "",
-            ),
-        )
-
-        generated.pdf_report = (
-            f"reports/pdf/{uploaded_file.name}.pdf"
-        )
-
-        generated.docx_report = (
-            f"reports/docx/{uploaded_file.name}.docx"
-        )
-
-        generated.save()
-
-        response = GeneratedReportSerializer(
-            generated
+            rows=report["dataset_information"]["Rows"],
+            columns=report["dataset_information"]["Columns"],
+            missing_values=report["dataset_information"]["Missing Values"],
+            executive_summary=report["executive_summary"],
+            insights=report["insights"],
+            recommendations=report["recommendations"],
+            conclusion=report["conclusion"],
+            pdf_report=f"reports/pdf/{uploaded_file.name}.pdf",
+            docx_report=f"reports/docx/{uploaded_file.name}.docx",
         )
 
         return Response(
-            response.data,
+            {
+                "id": generated.id,
+                "title": report["title"],
+                "generated_date": report["generated_date"],
+                "executive_summary": report["executive_summary"],
+                "dataset_information": report["dataset_information"],
+                "kpis": report["kpis"],
+                "statistics": report["statistics"],
+                "insights": report["insights"],
+                "risks": report["risks"],
+                "opportunities": report["opportunities"],
+                "recommendations": report["recommendations"],
+                "conclusion": report["conclusion"],
+                "pdf_report": generated.pdf_report.url,
+                "docx_report": generated.docx_report.url,
+            },
             status=status.HTTP_201_CREATED,
         )
     # ---------------------------------------------------------

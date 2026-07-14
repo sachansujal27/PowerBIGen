@@ -3,8 +3,8 @@ from datetime import datetime
 
 class BusinessReportGenerator:
     """
-    Converts analyzed Excel/PDF data
-    into a professional business report.
+    Converts analyzed Excel/PDF data into
+    a professional business report.
     """
 
     def __init__(self, analysis):
@@ -16,20 +16,19 @@ class BusinessReportGenerator:
 
     def executive_summary(self):
 
-        if "rows" in self.analysis:
+        rows = self.analysis.get("rows", 0)
+        columns = self.analysis.get("columns", 0)
+        missing = self.analysis.get("missing_values", 0)
+        duplicates = self.analysis.get("duplicate_rows", 0)
 
-            return (
-                f"The uploaded dataset contains "
-                f"{self.analysis['rows']} rows and "
-                f"{self.analysis['columns']} columns. "
-                "Automatic statistical analysis has been completed "
-                "to identify important business metrics, trends, "
-                "and opportunities."
-            )
-
-        return self.analysis.get(
-            "executive_summary",
-            "Business report generated successfully."
+        return (
+            f"The uploaded dataset contains {rows} records and "
+            f"{columns} columns. "
+            f"The analysis identified {missing} missing values and "
+            f"{duplicates} duplicate records. "
+            "The dataset has been automatically analyzed to evaluate "
+            "business performance, financial indicators, operational "
+            "efficiency and future growth opportunities."
         )
 
     # -------------------------------------------------------
@@ -39,24 +38,15 @@ class BusinessReportGenerator:
     def dataset_information(self):
 
         return {
-            "Rows":
-                self.analysis.get("rows", "-"),
-
-            "Columns":
-                self.analysis.get("columns", "-"),
-
-            "Missing Values":
-                self.analysis.get("missing_values", "-"),
-
-            "Duplicate Rows":
-                self.analysis.get("duplicate_rows", "-"),
-
-            "Memory Usage":
-                self.analysis.get("memory_usage", "-"),
+            "Rows": self.analysis.get("rows", 0),
+            "Columns": self.analysis.get("columns", 0),
+            "Missing Values": self.analysis.get("missing_values", 0),
+            "Duplicate Rows": self.analysis.get("duplicate_rows", 0),
+            "Memory Usage": self.analysis.get("memory_usage", "-"),
         }
 
     # -------------------------------------------------------
-    # KPI Section
+    # KPI
     # -------------------------------------------------------
 
     def kpi_section(self):
@@ -69,21 +59,93 @@ class BusinessReportGenerator:
 
     def statistics(self):
 
-        return self.analysis.get(
-            "statistics",
-            {}
+        return self.analysis.get("statistics", {})
+
+    # -------------------------------------------------------
+    # Business Findings
+    # -------------------------------------------------------
+
+    def business_findings(self):
+
+        findings = []
+
+        stats = self.analysis.get("statistics", {})
+
+        if not stats:
+            findings.append(
+                "Statistical information was not available for analysis."
+            )
+            return findings
+
+        for column, values in stats.items():
+
+            total = values.get("total", 0)
+            average = values.get("mean", values.get("average", 0))
+            maximum = values.get("max", values.get("maximum", 0))
+            minimum = values.get("min", values.get("minimum", 0))
+
+            findings.append(
+                f"{column} recorded a total value of {total}. "
+                f"The average value is {average:.2f}. "
+                f"The highest value observed is {maximum}, "
+                f"while the lowest value is {minimum}. "
+                f"This indicates consistent business activity."
+            )
+
+        return findings
+
+    # -------------------------------------------------------
+    # Business Growth
+    # -------------------------------------------------------
+
+    def growth_analysis(self):
+
+        rows = self.analysis.get("rows", 0)
+
+        if rows >= 1000:
+            return (
+                "The dataset is sufficiently large for reliable "
+                "business analysis and trend identification."
+            )
+
+        if rows >= 100:
+            return (
+                "The dataset provides adequate information for "
+                "performance evaluation."
+            )
+
+        return (
+            "The dataset is relatively small. Future reports "
+            "will become more accurate as additional data is collected."
         )
 
     # -------------------------------------------------------
-    # Business Insights
+    # Strengths
     # -------------------------------------------------------
 
-    def insights(self):
+    def strengths(self):
 
-        return self.analysis.get(
-            "insights",
-            []
+        strengths = []
+
+        if self.analysis.get("missing_values", 0) == 0:
+            strengths.append(
+                "The dataset contains no missing values."
+            )
+
+        if self.analysis.get("duplicate_rows", 0) == 0:
+            strengths.append(
+                "No duplicate records were detected."
+            )
+
+        strengths.append(
+            "The uploaded data can support business decision making."
         )
+
+        strengths.append(
+            "Business KPIs have been successfully generated."
+        )
+
+        return strengths
 
     # -------------------------------------------------------
     # Risks
@@ -94,21 +156,18 @@ class BusinessReportGenerator:
         risks = []
 
         if self.analysis.get("missing_values", 0) > 0:
-
             risks.append(
                 "Missing values may reduce analytical accuracy."
             )
 
         if self.analysis.get("duplicate_rows", 0) > 0:
-
             risks.append(
                 "Duplicate records may distort KPI calculations."
             )
 
-        if len(risks) == 0:
-
+        if not risks:
             risks.append(
-                "No major risks detected from uploaded dataset."
+                "No significant business risks were detected from the dataset."
             )
 
         return risks
@@ -119,20 +178,20 @@ class BusinessReportGenerator:
 
     def opportunities(self):
 
-        opportunities = [
+        return [
 
-            "Create interactive dashboards.",
+            "Increase sales in high-performing regions.",
 
-            "Monitor KPIs monthly.",
+            "Improve marketing for under-performing products.",
 
-            "Develop forecasting models.",
+            "Develop forecasting models using historical data.",
 
-            "Use predictive analytics.",
+            "Create interactive executive dashboards.",
 
-            "Improve decision making using data visualization.",
+            "Use predictive analytics for future planning.",
+
+            "Monitor KPIs regularly to improve decision making."
         ]
-
-        return opportunities
 
     # -------------------------------------------------------
     # Recommendations
@@ -140,12 +199,25 @@ class BusinessReportGenerator:
 
     def recommendations(self):
 
-        return self.analysis.get(
-            "recommendations",
-            [
-                "Continue monitoring business performance."
-            ]
-        )
+        recommendations = self.analysis.get("recommendations")
+
+        if recommendations:
+            return recommendations
+
+        return [
+
+            "Continue monitoring business performance monthly.",
+
+            "Improve operational efficiency using data-driven insights.",
+
+            "Reduce costs in low-performing business areas.",
+
+            "Expand successful products into new markets.",
+
+            "Track revenue and profit using dashboards.",
+
+            "Adopt AI-powered analytics for strategic planning."
+        ]
 
     # -------------------------------------------------------
     # Conclusion
@@ -153,53 +225,54 @@ class BusinessReportGenerator:
 
     def conclusion(self):
 
-        return self.analysis.get(
-            "conclusion",
-            "Business report completed successfully."
+        conclusion = self.analysis.get("conclusion")
+
+        if conclusion:
+            return conclusion
+
+        return (
+            "The uploaded dataset demonstrates meaningful business "
+            "information that can support strategic decision making. "
+            "Regular monitoring of KPIs, operational efficiency, "
+            "customer behaviour and financial performance will help "
+            "the organization achieve sustainable growth."
         )
 
     # -------------------------------------------------------
-    # Complete Report
+    # Generate Complete Report
     # -------------------------------------------------------
 
     def generate(self):
 
-        report = {
+        return {
 
-            "title":
-                "Business Analysis Report",
+            "title": "Business Analysis Report",
 
-            "generated_date":
-                datetime.now().strftime(
-                    "%d %B %Y %I:%M %p"
-                ),
+            "generated_date": datetime.now().strftime(
+                "%d %B %Y %I:%M %p"
+            ),
 
-            "executive_summary":
-                self.executive_summary(),
+            "executive_summary": self.executive_summary(),
 
-            "dataset_information":
-                self.dataset_information(),
+            "dataset_information": self.dataset_information(),
 
-            "kpis":
-                self.kpi_section(),
+            "kpis": self.kpi_section(),
 
-            "statistics":
-                self.statistics(),
+            "statistics": self.statistics(),
 
-            "insights":
-                self.insights(),
+            "business_findings": self.business_findings(),
 
-            "risks":
-                self.risks(),
+            "growth_analysis": self.growth_analysis(),
 
-            "opportunities":
-                self.opportunities(),
+            "strengths": self.strengths(),
 
-            "recommendations":
-                self.recommendations(),
+            "insights": self.analysis.get("insights", []),
 
-            "conclusion":
-                self.conclusion(),
+            "risks": self.risks(),
+
+            "opportunities": self.opportunities(),
+
+            "recommendations": self.recommendations(),
+
+            "conclusion": self.conclusion(),
         }
-
-        return report
