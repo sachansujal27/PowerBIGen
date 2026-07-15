@@ -47,7 +47,10 @@ class ReportService:
         print(analysis)
 
         if analysis is None:
-            raise Exception("Analyzer returned None.")
+                raise ValueError(
+        "ExcelAnalyzer.analyze() returned None. "
+        "Check excel_analyzer.py and ensure it returns a dictionary."
+    )
 
         return analysis
 

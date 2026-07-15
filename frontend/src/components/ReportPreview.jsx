@@ -1,145 +1,119 @@
-import {
-  BarChart,
-  Bar,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  AreaChart,
-  Area,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-  Cell,
-} from "recharts";
-
 import DownloadButtons from "./DownloadButtons";
-import { useState } from "react";
-import FileUploads from "../components/FileUploads";
 
 export default function ReportPreview({ report }) {
   if (!report) return null;
 
-  const summary = report.summary || {};
-
+  const dataset = report.dataset_information || {};
+  const statistics = report.statistics || {};
   const insights = report.insights || [];
-
-  const chartData =
-    report.charts?.bar_chart?.categories?.map((item, index) => ({
-      name: item,
-      value: report.charts.bar_chart.series[0].data[index],
-    })) || [];
+  const risks = report.risks || [];
+  const opportunities = report.opportunities || [];
+  const recommendations = report.recommendations || [];
+  const kpis = report.kpis || [];
 
   return (
     <div className="mt-10 space-y-10">
-      {/* PAGE 1 COVER */}
-
-      <div className="rounded-2xl bg-white p-10 text-black shadow-xl border">
-        <h1 className="text-4xl font-bold text-blue-700 border-b-4 border-blue-700 pb-3">
-          {report.title || "Business Analysis Report"}
-        </h1>
+      {/* Cover */}
+      <div className="rounded-2xl bg-white p-10 shadow-xl">
+        <h1 className="text-4xl font-bold text-blue-700">{report.title}</h1>
 
         <p className="mt-2 text-gray-500">
           Generated on {report.generated_date}
         </p>
 
-        <div className="mt-8">
-          <h2 className="text-2xl font-bold text-blue-700 border-b pb-2">
-            Executive Summary
-          </h2>
-
-          <p className="mt-4 leading-8 text-justify">
-            {report.executive_summary}
-          </p>
-        </div>
-      </div>
-      <div className="mt-8">
-        <h2 className="text-2xl font-bold text-blue-700 border-b pb-2">
-          Dataset Information
+        <h2 className="mt-8 text-2xl font-bold border-b pb-2">
+          Executive Summary
         </h2>
 
-        <table className="w-full mt-5 border">
+        <p className="mt-4 leading-8">{report.executive_summary}</p>
+      </div>
+
+      {/* Dataset */}
+      <div className="rounded-2xl bg-white p-8 shadow-xl">
+        <h2 className="text-2xl font-bold mb-5">Dataset Information</h2>
+
+        <table className="w-full border">
           <tbody>
             <tr>
               <td className="border p-3 font-semibold">Rows</td>
-
               <td className="border p-3">{dataset.Rows}</td>
             </tr>
 
             <tr>
               <td className="border p-3 font-semibold">Columns</td>
-
               <td className="border p-3">{dataset.Columns}</td>
             </tr>
 
             <tr>
               <td className="border p-3 font-semibold">Missing Values</td>
-
               <td className="border p-3">{dataset["Missing Values"]}</td>
             </tr>
 
             <tr>
               <td className="border p-3 font-semibold">Duplicate Rows</td>
-
               <td className="border p-3">{dataset["Duplicate Rows"]}</td>
             </tr>
 
             <tr>
               <td className="border p-3 font-semibold">Memory Usage</td>
-
               <td className="border p-3">{dataset["Memory Usage"]}</td>
             </tr>
           </tbody>
         </table>
       </div>
-      <div className="mt-10">
-        <h2 className="text-2xl font-bold text-blue-700 border-b pb-2">
-          Business Statistics
-        </h2>
 
-        <div className="space-y-6 mt-6">
-          {Object.entries(statistics).map(([column, values]) => (
-            <div key={column} className="border rounded-xl p-5 bg-blue-50">
-              <h3 className="text-xl font-bold text-blue-700">{column}</h3>
+      {/* KPI */}
+      <div className="rounded-2xl bg-white p-8 shadow-xl">
+        <h2 className="text-2xl font-bold mb-5">KPI Summary</h2>
 
-              <p className="mt-2">
-                <b>Total:</b> {values.total}
-              </p>
+        <div className="grid md:grid-cols-4 gap-5">
+          {kpis.map((kpi, index) => (
+            <div key={index} className="rounded-xl bg-blue-50 p-5 border">
+              <h3 className="font-semibold text-blue-700">{kpi.title}</h3>
 
-              <p>
-                <b>Average:</b> {values.mean}
-              </p>
-
-              <p>
-                <b>Maximum:</b> {values.max}
-              </p>
-
-              <p>
-                <b>Minimum:</b> {values.min}
-              </p>
+              <p className="text-2xl font-bold mt-2">{kpi.value}</p>
             </div>
           ))}
         </div>
       </div>
-      <div className="mt-10">
-        <h2 className="text-2xl font-bold text-green-700 border-b pb-2">
-          Business Insights
-        </h2>
 
-        <ul className="list-disc ml-8 mt-5 space-y-3">
+      {/* Statistics */}
+      <div className="rounded-2xl bg-white p-8 shadow-xl">
+        <h2 className="text-2xl font-bold mb-5">Statistics</h2>
+
+        {Object.keys(statistics).length === 0 ? (
+          <p>No statistics available.</p>
+        ) : (
+          Object.entries(statistics).map(([column, values]) => (
+            <div key={column} className="border rounded-xl p-5 mb-5">
+              <h3 className="font-bold text-xl mb-3">{column}</h3>
+
+              <p>Count : {values.count}</p>
+              <p>Mean : {values.mean}</p>
+              <p>Median : {values.median}</p>
+              <p>Minimum : {values.min}</p>
+              <p>Maximum : {values.max}</p>
+              <p>Sum : {values.sum}</p>
+              <p>Std Dev : {values.std}</p>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Insights */}
+      <div className="rounded-2xl bg-white p-8 shadow-xl">
+        <h2 className="text-2xl font-bold">Business Insights</h2>
+
+        <ul className="list-disc ml-8 mt-5">
           {insights.map((item, index) => (
-            <li key={index}>
-              {typeof item === "string" ? item : JSON.stringify(item)}
-            </li>
+            <li key={index}>{item}</li>
           ))}
         </ul>
       </div>
-      <div className="mt-10">
-        <h2 className="text-2xl font-bold text-red-700 border-b pb-2">
-          Business Risks
-        </h2>
+
+      {/* Risks */}
+      <div className="rounded-2xl bg-white p-8 shadow-xl">
+        <h2 className="text-2xl font-bold">Risks</h2>
 
         <ul className="list-disc ml-8 mt-5">
           {risks.map((risk, index) => (
@@ -147,21 +121,21 @@ export default function ReportPreview({ report }) {
           ))}
         </ul>
       </div>
-      <div className="mt-10">
-        <h2 className="text-2xl font-bold text-red-700 border-b pb-2">
-          Business Risks
-        </h2>
+
+      {/* Opportunities */}
+      <div className="rounded-2xl bg-white p-8 shadow-xl">
+        <h2 className="text-2xl font-bold">Opportunities</h2>
 
         <ul className="list-disc ml-8 mt-5">
-          {risks.map((risk, index) => (
-            <li key={index}>{risk}</li>
+          {opportunities.map((item, index) => (
+            <li key={index}>{item}</li>
           ))}
         </ul>
       </div>
-      <div className="mt-10">
-        <h2 className="text-2xl font-bold text-indigo-700 border-b pb-2">
-          Recommendations
-        </h2>
+
+      {/* Recommendations */}
+      <div className="rounded-2xl bg-white p-8 shadow-xl">
+        <h2 className="text-2xl font-bold">Recommendations</h2>
 
         <ul className="list-disc ml-8 mt-5">
           {recommendations.map((item, index) => (
@@ -169,10 +143,10 @@ export default function ReportPreview({ report }) {
           ))}
         </ul>
       </div>
-      <div className="mt-10">
-        <h2 className="text-2xl font-bold text-blue-700 border-b pb-2">
-          Conclusion
-        </h2>
+
+      {/* Conclusion */}
+      <div className="rounded-2xl bg-white p-8 shadow-xl">
+        <h2 className="text-2xl font-bold">Conclusion</h2>
 
         <p className="mt-5 leading-8">{report.conclusion}</p>
       </div>
